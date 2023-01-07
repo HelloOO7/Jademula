@@ -7,13 +7,14 @@ import javax.microedition.lcdui.Canvas;
 public class InputManager implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private static InputManager instance = new InputManager();
-	public Input up, down, left, right, fire, gamea, gameb, gamec, gamed;
+	public Input up, down, left, right, middle, fire, gamea, gameb, gamec, gamed;
 	public Input num0, num1, num2, num3, num4, num5, num6, num7, num8, num9, star, pound;
 	
 	private InputManager() {
 		up = new Input(Canvas.UP);
 		down = new Input(Canvas.DOWN);
 		left = new Input(Canvas.LEFT);
+		middle = new Input(-5);
 		right = new Input(Canvas.RIGHT);
 		fire = new Input(Canvas.FIRE);
 		gamea = new Input(Canvas.GAME_A);
@@ -47,6 +48,7 @@ public class InputManager implements Serializable {
 		up.checkKey(key);
 		down.checkKey(key);
 		left.checkKey(key);
+		middle.checkKey(key);
 		right.checkKey(key);
 		fire.checkKey(key);
 		gamea.checkKey(key);

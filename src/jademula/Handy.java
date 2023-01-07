@@ -39,13 +39,14 @@ public class Handy implements Serializable {
 	
 	public Handy() {
 		name = "Handy ";
-		width = 176;
-		height = 208;
+		width = 240;
+		height = 320;
 		
 		addKey(Canvas.UP);
 		addKey(Canvas.DOWN);
 		addKey(Canvas.LEFT);
 		addKey(Canvas.RIGHT);
+		addKey(-5);
 		addKey(Canvas.FIRE);
 		addKey(Canvas.GAME_A);
 		keys.get(Canvas.GAME_A).add(-6);

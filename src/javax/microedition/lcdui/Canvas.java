@@ -1,5 +1,6 @@
 package javax.microedition.lcdui;
 
+import jademula.Jademula;
 import jademula.gui.MainFrame;
 
 import java.awt.Dimension;
@@ -9,8 +10,10 @@ import java.util.Queue;
 
 import javax.swing.JPanel;
 
-
 public abstract class Canvas extends Displayable {
+
+	public static final boolean LIMIT_FPS = false;
+
 	public static final int UP = 1;
 	public static final int DOWN = 6;
 	public static final int LEFT = 2;
@@ -32,13 +35,13 @@ public abstract class Canvas extends Displayable {
 	public static final int KEY_NUM9 = 57;
 	public static final int KEY_STAR = 42;
 	public static final int KEY_POUND = 35;
-	
+
 	private java.awt.Canvas canvas;
 	private Graphics g;
 	private boolean activated;
 	private BufferStrategy bs;
 	private long lasttime;
-	
+
 	protected Canvas() {
 		canvas = new java.awt.Canvas();
 		canvas.setIgnoreRepaint(true);
@@ -62,7 +65,7 @@ public abstract class Canvas extends Displayable {
 	public boolean hasPointerEvents() {
 		return false; //todo
 	}
-	
+
 	public boolean hasPointerMotionEvents() {
 		return false; //todo
 	}
@@ -74,92 +77,103 @@ public abstract class Canvas extends Displayable {
 	//da fehlt wohl was...
 	public int getKeyCode(int gameAction) {
 		switch (gameAction) {
-		case UP:
-			return 50;
-		case DOWN:
-			return 56;
-		case LEFT:
-			return 52;
-		case RIGHT:
-			return 54;
-		case FIRE:
-			return 53;
-		case GAME_A:
-			return 21;
-		case GAME_B:
-			return 22;
-		case GAME_C:
-			return 23;
-		case GAME_D:
-			return 24;
-		default:
-			return 0;
+			case UP:
+				return 50;
+			case DOWN:
+				return 56;
+			case LEFT:
+				return 52;
+			case RIGHT:
+				return 54;
+			case FIRE:
+				return 53;
+			case GAME_A:
+				return 21;
+			case GAME_B:
+				return 22;
+			case GAME_C:
+				return 23;
+			case GAME_D:
+				return 24;
+			default:
+				return 0;
 		}
 	}
 
 	public String getKeyName(int keyCode) {
 		switch (keyCode) {
-		case 50:
-			return "UP";
-		case 56:
-			return "DOWN";
-		case 52:
-			return "LEFT";
-		case 54:
-			return "RIGHT";
-		case 53:
-			return "FIRE";
-		case 21:
-			return "GAME_A";
-		case 22:
-			return "GAME_B";
-		case 23:
-			return "GAME_C";
-		case 24:
-			return "GAME_D";
-		default:
-			return "Unknown Key";
+			case 50:
+				return "UP";
+			case 56:
+				return "DOWN";
+			case 52:
+				return "LEFT";
+			case 54:
+				return "RIGHT";
+			case 53:
+				return "FIRE";
+			case 21:
+				return "GAME_A";
+			case 22:
+				return "GAME_B";
+			case 23:
+				return "GAME_C";
+			case 24:
+				return "GAME_D";
+			default:
+				return "Unknown Key";
 		}
 	}
 
 	public int getGameAction(int keyCode) {
 		switch (keyCode) {
-		case 50:
-			return UP;
-		case 56:
-			return DOWN;
-		case 52:
-			return LEFT;
-		case 54:
-			return RIGHT;
-		case 53:
-			return FIRE;
-		case 21:
-			return GAME_A;
-		case 22:
-			return GAME_B;
-		case 23:
-			return GAME_C;
-		case 24:
-			return GAME_D;
-		default:
-			return 0;
+			case UP:
+			case 50:
+				return UP;
+			case DOWN:
+			case 56:
+				return DOWN;
+			case LEFT:
+			case 52:
+				return LEFT;
+			case RIGHT:
+			case 54:
+				return RIGHT;
+			case 53:
+				return FIRE;
+			case 21:
+				return GAME_A;
+			case 22:
+				return GAME_B;
+			case 23:
+				return GAME_C;
+			case 24:
+				return GAME_D;
+			default:
+				return 0;
 		}
 	}
 
-	public void setFullScreenMode(boolean mode) { }
+	public void setFullScreenMode(boolean mode) {
+	}
 
-	protected void keyPressed(int keyCode) { }
+	protected void keyPressed(int keyCode) {
+	}
 
-	protected void keyRepeated(int keyCode) { } //todo
+	protected void keyRepeated(int keyCode) {
+	} //todo
 
-	protected void keyReleased(int keyCode) { }
+	protected void keyReleased(int keyCode) {
+	}
 
-	protected void pointerPressed(int x, int y) { }
+	protected void pointerPressed(int x, int y) {
+	}
 
-	protected void pointerReleased(int x, int y) { }
+	protected void pointerReleased(int x, int y) {
+	}
 
-	protected void pointerDragged(int x, int y) { }
+	protected void pointerDragged(int x, int y) {
+	}
 
 	public final void repaint(int x, int y, int width, int height) {
 		repaint();
@@ -171,26 +185,32 @@ public abstract class Canvas extends Displayable {
 			try {
 				paint(g);
 				_flipBuffers();
+			} catch (NullPointerException ex) {
 			}
-			catch (NullPointerException ex) { }
 		}
 		Queue<Runnable> queue = MainFrame.getInstance().getDisplay()._getRunnables();
 		//for (int i = 0; i < runnablecount; ++i) {
-			Runnable r = queue.poll();
-			if (r != null) r.run();
+		Runnable r = queue.poll();
+		if (r != null) {
+			r.run();
+		}
 		//}
 	}
 
-	public final void serviceRepaints() { }
+	public final void serviceRepaints() {
+	}
 
-	protected void showNotify() { }
+	protected void showNotify() {
+	}
 
-	protected void hideNotify() { }
+	protected void hideNotify() {
+	}
 
 	protected abstract void paint(Graphics g);
 
-	protected void sizeChanged(int w, int h) { }
-	
+	protected void sizeChanged(int w, int h) {
+	}
+
 	public void _repaint() {
 		repaint();
 	}
@@ -202,42 +222,46 @@ public abstract class Canvas extends Displayable {
 		canvas.setPreferredSize(new Dimension(MainFrame.getInstance().getWidth(), MainFrame.getInstance().getHeight()));
 		canvas.createBufferStrategy(2);
 		bs = canvas.getBufferStrategy();
-		g = Graphics._create((Graphics2D) bs.getDrawGraphics());
+		g = Graphics._create((Graphics2D) bs.getDrawGraphics(), true);
 		activated = true;
 		showNotify();
 		repaint();
 		System.err.println("Canvas-Width: " + canvas.getWidth());
 	}
-	
+
 	public synchronized void _deactivate() {
 		activated = false;
 		hideNotify();
 	}
-	
+
 	public void _onKeyPressed(int k) {
 		keyPressed(k);
 	}
-	
+
 	public void _onKeyReleased(int k) {
 		keyReleased(k);
 	}
-	
+
 	public Graphics _getGraphics() {
 		return g;
 	}
-	
+
 	public synchronized void _flipBuffers() {
 		//System.err.println("Canvas-Width: " + canvas.getWidth());
 		bs.show();
-		try {
-			long dif = 33 * 1000000 - (System.nanoTime() - lasttime);
-			lasttime = System.nanoTime();
-			if (dif > 0) {
-				lasttime += 33 * 1000000;
-				long millidif = dif / 1000000;
-				Thread.sleep(millidif, (int)(dif - millidif * 1000000));
+		if (LIMIT_FPS) {
+			try {
+				long dif = 33 * 1000000 - (System.nanoTime() - lasttime);
+				lasttime = System.nanoTime();
+				if (dif > 0) {
+					lasttime += 33 * 1000000;
+					long millidif = dif / 1000000;
+					Thread.sleep(millidif, (int) (dif - millidif * 1000000));
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
-		catch (InterruptedException e) { e.printStackTrace(); }
+		Jademula.confirmChangeZoom();
 	}
 }

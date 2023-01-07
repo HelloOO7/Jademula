@@ -113,7 +113,7 @@ public class _Player implements Player {
 	public void setLoopCount(int count) {
 		if (state == STARTED && !sequencer.isRunning()) state = PREFETCHED;
 		if (state == CLOSED || state == STARTED) throw new IllegalStateException();
-		sequencer.setLoopCount(count);
+		sequencer.setLoopCount(count != -1 ? (count - 1) : count); //0 = disable looping on Java, 1 on J2ME
 	}
 	
 	public void addPlayerListener(PlayerListener playerListener) {

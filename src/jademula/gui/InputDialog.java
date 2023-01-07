@@ -91,6 +91,10 @@ public class InputDialog extends JDialog implements HandyInputListener, KeyCatch
 	public void downButtonPressed() {
 		pressed(InputManager.getInstance().down);
 	}
+	
+	public void middleButtonPressed() {
+		pressed(InputManager.getInstance().middle);
+	}
 
 	public void eightButtonPressed() {
 		pressed(InputManager.getInstance().num8);

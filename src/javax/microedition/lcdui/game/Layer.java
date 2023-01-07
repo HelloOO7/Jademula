@@ -1,7 +1,6 @@
 package javax.microedition.lcdui.game;
 
 import jademula.gui.MainFrame;
-
 import javax.microedition.lcdui.Graphics;
 
 

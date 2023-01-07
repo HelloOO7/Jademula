@@ -7,8 +7,8 @@ import java.awt.geom.AffineTransform;
 import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
-
 public class Sprite extends Layer {
+
 	public static final int TRANS_NONE = 0;
 	public static final int TRANS_ROT90 = 5;
 	public static final int TRANS_ROT180 = 3;
@@ -17,16 +17,16 @@ public class Sprite extends Layer {
 	public static final int TRANS_MIRROR_ROT90 = 7;
 	public static final int TRANS_MIRROR_ROT180 = 1;
 	public static final int TRANS_MIRROR_ROT270 = 4;
-	
+
 	private Image image;
 	private int width, height;
 	private int refx, refy;
-	
+
 	private int[] frames;
 	private int frame;
 	private int frameindex;
 	private int transform;
-	
+
 	public Sprite(Image image) {
 		this(image, image.getWidth(), image.getHeight());
 	}
@@ -37,12 +37,16 @@ public class Sprite extends Layer {
 		this.height = frameHeight;
 		//System.out.println("w1: " + image.getImage().getWidth() + " w2: " + width);
 		//System.out.println("h1: " + image.getImage().getHeight() + " h2: " + height);
-		frames = new int[image.getWidth() / width];
-		for (int i = 0; i < frames.length; ++i) frames[i] = i;
+		if (image != null) {
+			frames = new int[image.getWidth() / width];
+			for (int i = 0; i < frames.length; ++i) {
+				frames[i] = i;
+			}
+		}
 	}
 
 	public Sprite(Sprite s) {
-		
+
 	}
 
 	public void defineReferencePixel(int x, int y) {
@@ -52,12 +56,12 @@ public class Sprite extends Layer {
 
 	public void setRefPixelPosition(int x, int y) {
 		switch (transform) {
-		case TRANS_NONE:
-			setPosition(x - refx, y - refy);
-			break;
-		case TRANS_MIRROR:
-			setPosition(x - (width - refx), y - refy);
-			break;
+			case TRANS_NONE:
+				setPosition(x - refx, y - refy);
+				break;
+			case TRANS_MIRROR:
+				setPosition(x - (width - refx), y - refy);
+				break;
 		}
 	}
 
@@ -87,56 +91,66 @@ public class Sprite extends Layer {
 	}
 
 	public void nextFrame() {
-		if (frameindex >= frames.length - 1) frameindex = -1;
+		if (frameindex >= frames.length - 1) {
+			frameindex = -1;
+		}
 		frame = frames[++frameindex];
 	}
 
 	public void prevFrame() {
-		if (frameindex <= 1) frameindex = frames.length;
+		if (frameindex <= 1) {
+			frameindex = frames.length;
+		}
 		frame = frames[--frameindex];
 	}
 
-	public final void paint(Graphics g) {
+	public AffineTransform _getTransform(int zoom) {
 		AffineTransform trans = new AffineTransform();
 		switch (transform) {
-		case TRANS_NONE:
-			trans.translate(getX() * Jademula.getZoom(), getY() * Jademula.getZoom());
-			break;
-		case TRANS_ROT90:
-			System.out.println("Transformation not tested");
-			trans.rotate(Math.PI / 2);
-			trans.translate(getX() * Jademula.getZoom(), getY() * Jademula.getZoom());
-			break;
-		case TRANS_ROT180:
-			System.out.println("Transformation not tested");
-			trans.rotate(Math.PI);
-			trans.translate(getX() * Jademula.getZoom(), getY() * Jademula.getZoom());
-			break;
-		case TRANS_ROT270:
-			System.out.println("Transformation not tested");
-			trans.rotate(Math.PI * 1.5);
-			trans.translate(getX() * Jademula.getZoom(), getY() * Jademula.getZoom());
-			break;
-		case TRANS_MIRROR:
-			trans.translate(getX() * Jademula.getZoom(), getY() * Jademula.getZoom());
-			trans.scale(-1, 1);
-			trans.translate(-width  * Jademula.getZoom() -  Jademula.getZoom(), 0);
-			break;
-		case TRANS_MIRROR_ROT90:
-		case TRANS_MIRROR_ROT180:
-		case TRANS_MIRROR_ROT270:
-			System.out.println("Transformation not supported");
-			break;
+			case TRANS_NONE:
+				trans.translate(getX() * zoom, getY() * zoom);
+				break;
+			case TRANS_ROT90:
+				//System.out.println("Transformation not tested");
+				trans.rotate(Math.PI / 2);
+				trans.translate(getX() * zoom, getY() * zoom);
+				break;
+			case TRANS_ROT180:
+				//System.out.println("Transformation not tested");
+				trans.rotate(Math.PI);
+				trans.translate(getX() * zoom, getY() * zoom);
+				break;
+			case TRANS_ROT270:
+				//System.out.println("Transformation not tested");
+				trans.rotate(Math.PI * 1.5);
+				trans.translate(getX() * zoom, getY() * Jademula.getZoom());
+				break;
+			case TRANS_MIRROR:
+				trans.translate(getX() * zoom, getY() * zoom);
+				trans.scale(-1, 1);
+				trans.translate(-width * zoom - zoom, 0);
+				break;
+			case TRANS_MIRROR_ROT90:
+			case TRANS_MIRROR_ROT180:
+			case TRANS_MIRROR_ROT270:
+				//System.out.println("Transformation not supported");
+				break;
 		}
-		g._getGraphics().drawImage(
-				image._getImage().getSubimage(
-						(width * Jademula.getZoom() * frame),// % (image.getWidth()),
-						0,//(height * T_Mobile.getZoom()) * (width * T_Mobile.getZoom() * frame) / (image.getWidth()),
-						width * Jademula.getZoom(),
-						height * Jademula.getZoom()
+		return trans;
+	}
+
+	public final void paint(Graphics g) {
+		if (image != null) {
+			g._getGraphics().drawImage(
+				image._getImage(Jademula.getZoom()).getSubimage(
+					(width * Jademula.getZoom() * frame),// % (image.getWidth()),
+					0,//(height * T_Mobile.getZoom()) * (width * T_Mobile.getZoom() * frame) / (image.getWidth()),
+					width * Jademula.getZoom(),
+					height * Jademula.getZoom()
 				),
-			trans, null
-		);
+				_getTransform(Jademula.getZoom()), null
+			);
+		}
 	}
 
 	public void setFrameSequence(int[] sequence) {

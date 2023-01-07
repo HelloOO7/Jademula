@@ -13,7 +13,10 @@ import javax.imageio.ImageIO;
 
 
 public class Image {
-	private BufferedImage original, scaled;
+	private BufferedImage original;
+	
+	private final BufferedImage[] scaled = new BufferedImage[1 + 4];
+	
 	private int width, height;
 	private boolean hasToUpdate = false;
 
@@ -63,7 +66,7 @@ public class Image {
 
 	public Graphics getGraphics() {
 		hasToUpdate = true;
-		return Graphics._create(original.createGraphics());
+		return Graphics._create(original.createGraphics(), false);
 	}
 
 	public int getWidth() {
@@ -88,7 +91,8 @@ public class Image {
 	}
 
 	public void getRGB(int[] rgbData, int offset, int scanlength, int x, int y, int width, int height) {
-		System.err.println("Image.getRGB() not implemented.");
+		//System.err.println("Image.getRGB() not implemented.");
+		original.getRGB(x, y, width, height, rgbData, offset, scanlength);
 	}
 	
 	private Image(BufferedImage image) {
@@ -96,60 +100,49 @@ public class Image {
 		height = image.getHeight();
 		this.original = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		this.original.getGraphics().drawImage(image, 0, 0, null);
-		_createScaled();
-		images.add(new WeakReference<Image>(this));
 	}
 	
 	private Image(Image source) {
 		this.original = source.original;
 		this.width = source.width;
 		this.height = source.height;
-		_createScaled();
-		images.add(new WeakReference<Image>(this));
 	}
 
 	private Image(int width, int height) {
 		original = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		this.width = width;
 		this.height = height;
-		_createScaled();
-		images.add(new WeakReference<Image>(this));
 	}
 	
 	private Image(int[] rgb, int width, int height) {
 		this(width, height);
 		original.setRGB(0, 0, width, height, rgb, 0, width);
-		_createScaled();
-		images.add(new WeakReference<Image>(this));
 	}
 	
-	private void _createScaled() {
-		scaled = new BufferedImage(width * Jademula.getZoom(), height * Jademula.getZoom(), BufferedImage.TYPE_INT_ARGB);
-		scaled.getGraphics().drawImage(original.getScaledInstance(original.getWidth() * Jademula.getZoom(), original.getHeight() * Jademula.getZoom(), 0), 0, 0, null);
+	private void _createScaled(int zoom) {
+		BufferedImage bi = scaled[zoom] == null ? new BufferedImage(width * zoom, height * zoom, BufferedImage.TYPE_INT_ARGB) : scaled[zoom];
+		bi.getGraphics().drawImage(original.getScaledInstance(original.getWidth() * zoom, original.getHeight() * zoom, 0), 0, 0, null);
+		scaled[zoom] = bi;
 	}
 	
-	public BufferedImage _getImage() {
+	private void _ensureScaledInstance(int zoom) {
+		if (scaled[zoom] == null) {
+			_createScaled(zoom);
+		}
+	}
+	
+	public BufferedImage _getImage(int zoom) {
 		if (hasToUpdate) {
-			_createScaled();
+			_createScaled(zoom);
 			hasToUpdate = false;
 		}
-		return scaled;
+		else {
+			_ensureScaledInstance(zoom);
+		}
+		return scaled[zoom];
 	}
 	
 	public static Image _createImage(BufferedImage image) {
 		return new Image(image);
 	}
-	
-	public static void _updateSize() {
-		for (int i = 0; i < images.size(); ++i) {
-			if (images.get(i).get() == null) {
-				images.remove(i);
-				--i;
-				continue;
-			}
-			images.get(i).get()._createScaled();
-		}
-	}
-	
-	private static java.util.List<WeakReference<Image>> images = new ArrayList<WeakReference<Image>>();
 }

@@ -28,6 +28,7 @@ interface HandyInputListener {
 	public void upButtonPressed();
 	public void downButtonPressed();
 	public void rightButtonPressed();
+	public void middleButtonPressed();
 	public void leftButtonPressed();
 	public void poundButtonPressed();
 	public void starButtonPressed();
@@ -53,7 +54,7 @@ public class HandyInput extends JPanel {
 		add(new JLabel(""));
 		
 		addLeftButton();
-		add(new JLabel(""));
+		addMiddleButton();
 		addRightButton();
 		
 		add(new JLabel(""));
@@ -131,6 +132,18 @@ public class HandyInput extends JPanel {
 			new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					upButtonPressed();
+				}
+			}
+		);
+		add(button);
+	}
+	
+	private void addMiddleButton() {
+		JButton button = new JButton("•");
+		button.addActionListener(
+			new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					middleButtonPressed();
 				}
 			}
 		);
@@ -383,6 +396,10 @@ public class HandyInput extends JPanel {
 	
 	public void rightButtonPressed() {
 		for (HandyInputListener listener : listeners) listener.rightButtonPressed();
+	}
+	
+	public void middleButtonPressed() {
+		for (HandyInputListener listener : listeners) listener.middleButtonPressed();
 	}
 	
 	public void leftButtonPressed() {

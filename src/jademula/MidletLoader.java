@@ -10,8 +10,9 @@ import java.util.jar.Manifest;
 import javax.microedition.midlet.MIDlet;
 
 public class MidletLoader {
+
 	private Attributes attr;
-	private URLClassLoader loader;
+	private ClassLoader loader;
 	private String midletName;
 	private MIDlet m;
 
@@ -20,33 +21,58 @@ public class MidletLoader {
 		start();
 	}
 
+	public MidletLoader(String midletName, Attributes attr) {
+		this.midletName = midletName;
+		this.attr = attr;
+		if (midletName == null) {
+			this.loader = ClassLoader.getSystemClassLoader();
+		} else {
+			start();
+		}
+	}
+
+	public void run(Class<?> c) {
+		try {
+			MIDlet._setAttr(attr);
+			this.m = (MIDlet) c.newInstance();
+			m._startApp();
+		} catch (InstantiationException ex) {
+			throw new RuntimeException(ex);
+		} catch (IllegalAccessException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
+
 	public void run() {
 		try {
 			Class<?> c = loader.loadClass(getMidletClass().replace('/', '.'));
-			MIDlet._setAttr(attr);
-			m = (MIDlet) c.newInstance();
-			m._startApp();
-		}
-		catch (Throwable t) {
+			run(c);
+		} catch (Throwable t) {
 			t.printStackTrace();
 			throw new RuntimeException("Could not start the MIDlet. " + t);
 		}
 	}
-	
+
 	public void restart() {
+		m._setDestroyListener(new Runnable() {
+			@Override
+			public void run() {
+				MidletLoader.this.run();
+			}
+		});
 		m._destroyApp();
-		run();
 	}
-	
+
 	private void start() {
 		try {
 			loader = new URLClassLoader(new URL[]{new File(midletName).toURI().toURL()}, ClassLoader.getSystemClassLoader());
-			JarFile midlet = new JarFile(midletName);
-			Manifest manifest = midlet.getManifest();
-			attr = manifest.getMainAttributes();
+			if (midletName.endsWith(".jar")) {
+				JarFile midlet = new JarFile(midletName);
+				Manifest manifest = midlet.getManifest();
+				attr = manifest.getMainAttributes();
+			}
 			ClassPathHacker.addFile(midletName);
-		}
-		catch (Throwable t) {
+		} catch (Throwable t) {
 			throw new RuntimeException("Could not start the MIDlet. " + t);
 		}
 	}
@@ -54,11 +80,11 @@ public class MidletLoader {
 	public void stop() {
 		ClassPathHacker.removeFile(midletName);
 	}
-	
+
 	public String getAttribute(String name) {
 		return attr.getValue(name);
 	}
-	
+
 	private String getMidletClass() {
 		return attr.getValue("MIDlet-1").split(",")[2].trim();
 	}

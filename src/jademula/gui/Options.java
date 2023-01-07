@@ -315,6 +315,10 @@ public class Options extends JDialog implements HandyInputListener {
 	public void rightButtonPressed() {
 		updateInput(Canvas.RIGHT);
 	}
+	
+	public void middleButtonPressed() {
+		updateInput(-5); //SOFT_KEY_MIDDLE_NOKIA
+	}
 
 	public void sevenButtonPressed() {
 		updateInput(Canvas.KEY_NUM7);

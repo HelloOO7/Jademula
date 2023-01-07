@@ -70,17 +70,18 @@ public class _DirectGraphics implements DirectGraphics {
 		sprite.paint(g);
 	}
 
+	@Override
 	public void fillPolygon(int[] xPoints, int xOffset, int[] yPoints, int yOffset, int nPoints, int argbColor) {
 		int[] xp = new int[xPoints.length - xOffset];
 		int[] yp = new int[yPoints.length - yOffset];
 		for (int i = 0; i < xp.length; ++i) {
-			xp[i] = xPoints[i + xOffset] * Jademula.getZoom();
+			xp[i] = xPoints[i + xOffset] * g.getZoom();
 		}
 		for (int i = 0; i < yp.length; ++i) {
-			yp[i] = yPoints[i + yOffset] * Jademula.getZoom();
+			yp[i] = yPoints[i + yOffset] * g.getZoom();
 		}
 		Color c = g._getGraphics().getColor();
-		g.setColor(argbColor);
+		g._getGraphics().setColor(new Color(argbColor, true));
 		g._getGraphics().fillPolygon(xp, yp, nPoints);
 		g._getGraphics().setColor(c);
 	}
@@ -101,10 +102,10 @@ public class _DirectGraphics implements DirectGraphics {
 		int[] xp = new int[xPoints.length - xOffset];
 		int[] yp = new int[yPoints.length - yOffset];
 		for (int i = 0; i < xp.length; ++i) {
-			xp[i] = xPoints[i + xOffset] * Jademula.getZoom();
+			xp[i] = xPoints[i + xOffset] * g.getZoom();
 		}
 		for (int i = 0; i < yp.length; ++i) {
-			yp[i] = yPoints[i + yOffset] * Jademula.getZoom();
+			yp[i] = yPoints[i + yOffset] * g.getZoom();
 		}
 		Color c = g._getGraphics().getColor();
 		g.setColor(argbColor);

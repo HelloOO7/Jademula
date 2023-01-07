@@ -5,37 +5,50 @@ import java.util.jar.Attributes;
 import javax.microedition.io.ConnectionNotFoundException;
 
 public abstract class MIDlet {
+
 	private static Attributes attributes;
 	private Attributes attr;
 
+	private Runnable destroyListener = null;
+	
 	public static void _setAttr(Attributes attr) {
 		attributes = attr;
 	}
 	
+	public void _setDestroyListener(Runnable r) {
+		destroyListener = r;
+	}
+
 	protected MIDlet() {
 		attr = attributes;
 	}
 
 	protected abstract void startApp() throws MIDletStateChangeException;
+
 	protected abstract void pauseApp();
+
 	protected abstract void destroyApp(boolean unconditional) throws MIDletStateChangeException;
 
 	public final void notifyDestroyed() {
-		//System.exit(0);
+		if (destroyListener != null) {
+			destroyListener.run();
+		}
 	}
 
 	public final void notifyPaused() {
-		
+
 	}
 
 	public final String getAppProperty(String key) {
 		String prop = attr.getValue(key);
-		if (prop != null) prop = prop.trim();
+		if (prop != null) {
+			prop = prop.trim();
+		}
 		return prop;
 	}
 
 	public final void resumeRequest() {
-		
+
 	}
 
 	public final boolean platformRequest(String URL) throws ConnectionNotFoundException {
@@ -45,21 +58,19 @@ public abstract class MIDlet {
 	public final int checkPermission(String permission) {
 		return 0;
 	}
-	
+
 	public void _startApp() {
 		try {
 			startApp();
-		}
-		catch (MIDletStateChangeException ex) {
+		} catch (MIDletStateChangeException ex) {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	public void _destroyApp() {
 		try {
 			destroyApp(true);
-		}
-		catch (Throwable t) {
+		} catch (Throwable t) {
 			System.out.println("Error destroying app");
 		}
 	}

@@ -98,7 +98,7 @@ public class Font {
 	}
 
 	public int charsWidth(char[] ch, int offset, int length) {
-		return stringWidth(new String(ch, offset, length)) / Jademula.getZoom();
+		return stringWidth(new String(ch, offset, length));
 	}
 
 	public int stringWidth(String str) {
@@ -109,7 +109,7 @@ public class Font {
 	public int substringWidth(String str, int offset, int len) {
 		if (str == null) throw new NullPointerException();
 		if (offset < 0 || offset > str.length() || len < 0 || (offset + len) > str.length()) throw new StringIndexOutOfBoundsException();
-		return stringWidth(str.substring(offset, offset + len)) / Jademula.getZoom(); // -1
+		return stringWidth(str.substring(offset, offset + len)); // -1
 	}
 	
 	private static java.util.List<WeakReference<Font>> fonts;
