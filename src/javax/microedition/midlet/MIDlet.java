@@ -11,6 +11,8 @@ public abstract class MIDlet {
 
 	private Runnable destroyListener = null;
 	
+	public boolean _destroyed;
+	
 	public static void _setAttr(Attributes attr) {
 		attributes = attr;
 	}
@@ -33,6 +35,7 @@ public abstract class MIDlet {
 		if (destroyListener != null) {
 			destroyListener.run();
 		}
+		_destroyed = true;
 	}
 
 	public final void notifyPaused() {

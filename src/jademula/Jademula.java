@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -16,6 +17,7 @@ import java.util.logging.Logger;
 
 import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
+import javax.swing.SwingUtilities;
 
 public class Jademula {
 
@@ -40,23 +42,16 @@ public class Jademula {
 	public static void main(String[] args) {
 		setProperties();
 		load();
-		//if (args.length > 0) gameindex = Integer.parseInt(args[0]);
-		new Thread(new DirectInput(MainFrame.getInstance().getFrame())).start(); //ungut?
-		/*File dir = new File(gamedir);
-		games = dir.list();
-		System.out.println("Starting " + gameindex + ": " + games[gameindex - 1]);
-		loader = new MidletLoader(gamedir + games[gameindex - 1]);
-		loader.run();*/
- /*javax.swing.SwingUtilities.invokeLater(
-				new Runnable()
-				{
-					public void run()
-					{
-						handy = new Handy(200,200);
-					}
-				}
-			);
-		 */
+		try {
+			SwingUtilities.invokeAndWait((() -> {
+				MainFrame.init();
+				new Thread(new DirectInput(MainFrame.getInstance().getFrame())).start(); //ungut?
+			}));
+		} catch (InterruptedException ex) {
+			Logger.getLogger(Jademula.class.getName()).log(Level.SEVERE, null, ex);
+		} catch (InvocationTargetException ex) {
+			Logger.getLogger(Jademula.class.getName()).log(Level.SEVERE, null, ex);
+		}
 	}
 
 	public static void unload() {

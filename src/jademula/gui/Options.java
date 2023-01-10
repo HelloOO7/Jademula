@@ -8,7 +8,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -27,8 +26,8 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
-
 public class Options extends JDialog implements HandyInputListener {
+
 	private static final long serialVersionUID = 1L;
 	private static Options instance;
 	private JTextField inputfield;
@@ -40,7 +39,7 @@ public class Options extends JDialog implements HandyInputListener {
 	JComboBox<String> handies;
 	JTextField namefield, widthfield, heightfield;
 	ItemListener itemlistener;
-	
+
 	static {
 		instance = new Options();
 	}
@@ -57,17 +56,18 @@ public class Options extends JDialog implements HandyInputListener {
 		inputbutton.setEnabled(false);
 		resetbutton.setEnabled(false);
 	}
-	
+
 	private synchronized void updateList() {
 		handies.removeItemListener(itemlistener);
 		handies.removeAllItems();
-		for (Handy handy : Handy.getHandies())
+		for (Handy handy : Handy.getHandies()) {
 			handies.addItem(handy.getName());
+		}
 		handies.setSelectedIndex(currenthandy);
 		handies.addItemListener(itemlistener);
 		MainFrame.getInstance().updateHandies();
 	}
-	
+
 	private Options() {
 		super(MainFrame.getInstance().getFrame(), "Options");
 		//JPanel
@@ -78,14 +78,16 @@ public class Options extends JDialog implements HandyInputListener {
 		handies.setPreferredSize(new Dimension(100, handies.getPreferredSize().height));
 		itemlistener = new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
-				if (handies.getSelectedIndex() != -1) changeHandy(handies.getSelectedIndex());
+				if (handies.getSelectedIndex() != -1) {
+					changeHandy(handies.getSelectedIndex());
+				}
 			}
 		};
 		handies.addItemListener(itemlistener);
 		//handies.addActionListener(new ActionListener() {
-			//public void actionPerformed(ActionEvent e) {
-				//if (handies.getSelectedIndex() != -1) changeHandy(handies.getSelectedIndex());
-			//}
+		//public void actionPerformed(ActionEvent e) {
+		//if (handies.getSelectedIndex() != -1) changeHandy(handies.getSelectedIndex());
+		//}
 		//});
 		start.add(handies);
 		JButton addbutton = new JButton("Add");
@@ -106,7 +108,8 @@ public class Options extends JDialog implements HandyInputListener {
 		text.add(new JLabel(" Name:"));
 		text.add(namefield = new JTextField());
 		namefield.addKeyListener(new KeyListener() {
-			public void keyPressed(KeyEvent e) { }
+			public void keyPressed(KeyEvent e) {
+			}
 
 			public void keyReleased(KeyEvent e) {
 				for (int i = 0; i < Handy.getHandies().size(); ++i) {
@@ -122,44 +125,47 @@ public class Options extends JDialog implements HandyInputListener {
 				updateList();
 			}
 
-			public void keyTyped(KeyEvent e) { }
+			public void keyTyped(KeyEvent e) {
+			}
 		});
 		text.add(new JLabel(" Width:"));
 		text.add(widthfield = new JTextField());
 		widthfield.addKeyListener(new KeyListener() {
-			public void keyPressed(KeyEvent e) { }
+			public void keyPressed(KeyEvent e) {
+			}
 
 			public void keyReleased(KeyEvent e) {
 				try {
 					Handy.getHandies().get(currenthandy).setWidth(Integer.parseInt(widthfield.getText()));
 					widthfield.setBackground(inputback);
-				}
-				catch (NumberFormatException ex) {
+				} catch (NumberFormatException ex) {
 					widthfield.setBackground(Color.red);
 				}
 			}
 
-			public void keyTyped(KeyEvent e) { }
+			public void keyTyped(KeyEvent e) {
+			}
 		});
 		text.add(new JLabel(" Height:"));
 		text.add(heightfield = new JTextField());
 		heightfield.addKeyListener(new KeyListener() {
-			public void keyPressed(KeyEvent e) { }
+			public void keyPressed(KeyEvent e) {
+			}
 
 			public void keyReleased(KeyEvent e) {
 				try {
 					Handy.getHandies().get(currenthandy).setHeight(Integer.parseInt(heightfield.getText()));
 					heightfield.setBackground(inputback);
-				}
-				catch (NumberFormatException ex) {
+				} catch (NumberFormatException ex) {
 					heightfield.setBackground(Color.red);
 				}
 			}
 
-			public void keyTyped(KeyEvent e) { }
+			public void keyTyped(KeyEvent e) {
+			}
 		});
 		center.add(text);
-		
+
 		center.add(new JSeparator());
 
 		inputlabel = new JLabel(" ");
@@ -169,7 +175,8 @@ public class Options extends JDialog implements HandyInputListener {
 		input.setLayout(new GridLayout(1, 2));
 		inputfield = new JTextField();
 		inputfield.addKeyListener(new KeyListener() {
-			public void keyPressed(KeyEvent e) { }
+			public void keyPressed(KeyEvent e) {
+			}
 
 			public void keyReleased(KeyEvent e) {
 				System.err.println(inputfield.getText());
@@ -177,14 +184,14 @@ public class Options extends JDialog implements HandyInputListener {
 					Integer.parseInt(inputfield.getText());
 					inputfield.setBackground(inputback);
 					inputbutton.setEnabled(true);
-				}
-				catch (NumberFormatException ex) {
+				} catch (NumberFormatException ex) {
 					inputfield.setBackground(Color.red);
 					inputbutton.setEnabled(false);
 				}
 			}
 
-			public void keyTyped(KeyEvent e) { }
+			public void keyTyped(KeyEvent e) {
+			}
 		});
 		input.add(inputfield);
 		inputbutton = new JButton("Add");
@@ -196,8 +203,8 @@ public class Options extends JDialog implements HandyInputListener {
 						Handy.getHandies().get(currenthandy).addKey(currentkey, Integer.parseInt(inputfield.getText()));
 						updateInputLabel();
 					}
+				} catch (NumberFormatException ex) {
 				}
-				catch (NumberFormatException ex) { }
 			}
 		});
 		input.add(inputbutton);
@@ -223,40 +230,53 @@ public class Options extends JDialog implements HandyInputListener {
 		handyinput.addListener(this);
 		center.add(handyinput);
 		add(center, BorderLayout.CENTER);
-		
+
 		/*JPanel end = new JPanel(new FlowLayout());
 		end.add(new JButton("OK"));
 		end.add(new JButton("Cancel"));
 		add(end, BorderLayout.PAGE_END);*/
-		
 		changeHandy(0);
-		
+
 		setResizable(false);
 		pack();
-		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-		setLocation((screen.width - getWidth()) / 2, (screen.height - getHeight()) / 2);
+		setLocationRelativeTo(null);
 	}
-	
+
+	public void setVisible(boolean v) {
+		super.setVisible(v);
+		if (v == false) {
+			//for some ungodly reason windowlistener isn't working, so this is here
+			int w = Handy.getCurrent().getWidth();
+			int h = Handy.getCurrent().getHeight();
+			MainFrame.getInstance().setInternalResolution(w, h);
+		}
+	}
+
 	public static Options getInstance() {
 		return instance;
 	}
-	
+
 	private void updateInputLabel() {
-		if (currentkey == -1) return;
+		if (currentkey == -1) {
+			return;
+		}
 		String text = "";
 		List<Integer> emitters = Handy.getHandies().get(currenthandy).getEmitters(currentkey);
-		if (emitters.size() == 0) text = " ";
+		if (emitters.size() == 0) {
+			text = " ";
+		}
 		boolean first = true;
 		for (Integer emitter : emitters) {
 			if (first) {
 				text += emitter;
 				first = false;
+			} else {
+				text += ", " + emitter;
 			}
-			else text += ", " + emitter;
 		}
 		inputlabel.setText(text);
 	}
-	
+
 	private void updateInput(int key) {
 		currentkey = key;
 		updateInputLabel();
@@ -315,7 +335,7 @@ public class Options extends JDialog implements HandyInputListener {
 	public void rightButtonPressed() {
 		updateInput(Canvas.RIGHT);
 	}
-	
+
 	public void middleButtonPressed() {
 		updateInput(-5); //SOFT_KEY_MIDDLE_NOKIA
 	}

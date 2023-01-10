@@ -2,17 +2,21 @@ package javax.microedition.lcdui;
 
 import jademula.Jademula;
 import jademula.gui.MainFrame;
+import java.awt.Color;
+import java.awt.Container;
 
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.image.BufferStrategy;
+import java.util.Arrays;
 import java.util.Queue;
+import javax.swing.JLabel;
 
 import javax.swing.JPanel;
 
 public abstract class Canvas extends Displayable {
 
-	public static final boolean LIMIT_FPS = false;
+	public static boolean LIMIT_FPS = true;
 
 	public static final int UP = 1;
 	public static final int DOWN = 6;
@@ -215,11 +219,11 @@ public abstract class Canvas extends Displayable {
 		repaint();
 	}
 
-	public synchronized void _activate(JPanel panel) {
-		panel.setSize(new Dimension(MainFrame.getInstance().getWidth(), MainFrame.getInstance().getHeight()));
-		panel.add(canvas);
+	public synchronized void _activate(Container panel) {
 		canvas.setSize(new Dimension(MainFrame.getInstance().getWidth(), MainFrame.getInstance().getHeight()));
 		canvas.setPreferredSize(new Dimension(MainFrame.getInstance().getWidth(), MainFrame.getInstance().getHeight()));
+		panel.setSize(new Dimension(MainFrame.getInstance().getWidth(), MainFrame.getInstance().getHeight()));
+		panel.add(canvas);
 		canvas.createBufferStrategy(2);
 		bs = canvas.getBufferStrategy();
 		g = Graphics._create((Graphics2D) bs.getDrawGraphics(), true);
@@ -247,21 +251,23 @@ public abstract class Canvas extends Displayable {
 	}
 
 	public synchronized void _flipBuffers() {
-		//System.err.println("Canvas-Width: " + canvas.getWidth());
-		bs.show();
-		if (LIMIT_FPS) {
-			try {
-				long dif = 33 * 1000000 - (System.nanoTime() - lasttime);
-				lasttime = System.nanoTime();
-				if (dif > 0) {
-					lasttime += 33 * 1000000;
-					long millidif = dif / 1000000;
-					Thread.sleep(millidif, (int) (dif - millidif * 1000000));
+		if (activated) {
+			//System.err.println("Canvas-Width: " + canvas.getWidth());
+			bs.show();
+			if (LIMIT_FPS) {
+				try {
+					long dif = 33 * 1000000 - (System.nanoTime() - lasttime);
+					lasttime = System.nanoTime();
+					if (dif > 0) {
+						lasttime += 33 * 1000000;
+						long millidif = dif / 1000000;
+						Thread.sleep(millidif, (int) (dif - millidif * 1000000));
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
 			}
+			Jademula.confirmChangeZoom();
 		}
-		Jademula.confirmChangeZoom();
 	}
 }

@@ -2,6 +2,7 @@ package javax.microedition.lcdui;
 
 import jademula.Jademula;
 import jademula.gui.MainFrame;
+import java.awt.Container;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +72,7 @@ public abstract class Displayable {
 	
 	public void _repaint() { }
 	
-	public void _activate(JPanel panel) { }
+	public void _activate(Container panel) { }
 	
 	public void _deactivate() { }
 	

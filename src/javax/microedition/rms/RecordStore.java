@@ -61,7 +61,7 @@ public class RecordStore {
 			out.writeObject(records);
 			out.close();
 		}
-		catch (IOException ex) { }
+		catch (IOException ex) { ex.printStackTrace(); }
 	}
 	
 	@SuppressWarnings("unchecked")

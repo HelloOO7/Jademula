@@ -54,13 +54,18 @@ public class MidletLoader {
 	}
 
 	public void restart() {
-		m._setDestroyListener(new Runnable() {
-			@Override
-			public void run() {
-				MidletLoader.this.run();
-			}
-		});
-		m._destroyApp();
+		if (!m._destroyed) {
+			m._setDestroyListener(new Runnable() {
+				@Override
+				public void run() {
+					MidletLoader.this.run();
+				}
+			});
+			m._destroyApp();
+		}
+		else {
+			run();
+		}
 	}
 
 	private void start() {
