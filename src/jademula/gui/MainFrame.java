@@ -9,6 +9,7 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -45,11 +46,14 @@ public class MainFrame {
 	private JFrame fullscreenFrame;
 	private Canvas canvas;
 	private BufferStrategy bs;
-	private JPanel displayPanel, commandsPanel;
+	private JPanel displayPanel, commandsPanel, fullscreenPanel;
 	private JButton[] commands;
 	private int commandIndex;
 	private Graphics2D g;
 	private Menu menu;
+	
+	private boolean fullscreenActive = false;
+	private boolean fullscreenOpening;
 
 	static final GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 
@@ -58,19 +62,29 @@ public class MainFrame {
 			throw new RuntimeException("This must be run from the EDT!");
 		}
 		instance = new MainFrame(Handy.getCurrent().getWidth() * Jademula.getZoom(), Handy.getCurrent().getHeight() * Jademula.getZoom());
-		
+
 		Action toggleFullscreenAction = new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (isFullscreen()) {
-					device.setFullScreenWindow(null);
-					instance.fullscreenFrame.setVisible(false);
-					instance.frame.setVisible(true);
-				} else {
-					instance.frame.setVisible(false);
-					device.setFullScreenWindow(instance.fullscreenFrame);
+				Runnable r = () -> {
+					if (isFullscreen()) {
+						device.setFullScreenWindow(null);
+						instance.fullscreenFrame.setVisible(false);
+						instance.frame.setVisible(true);
+					} else {
+						instance.frame.setVisible(false);
+						device.setFullScreenWindow(instance.fullscreenFrame);
+						instance.fullscreenOpening = true;
+					}
+					instance.fullscreenActive = !instance.fullscreenActive;
+					instance.updateCanvas();
+				};
+				if (SwingUtilities.isEventDispatchThread()) {
+					r.run();
 				}
-				instance.updateCanvas();
+				else {
+					SwingUtilities.invokeLater(r);
+				}
 			}
 		};
 
@@ -86,7 +100,7 @@ public class MainFrame {
 			current = null;
 		}
 	}
-	
+
 	private void updateCanvas() {
 		setDisplayable(current);
 	}
@@ -106,6 +120,8 @@ public class MainFrame {
 		//frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
+				device.setFullScreenWindow(null);
+				fullscreenFrame.dispose();
 				Jademula.exit();
 			}
 		});
@@ -113,12 +129,12 @@ public class MainFrame {
 			public void windowClosing(WindowEvent e) {
 				Jademula.exit();
 			}
-			public void windowOpened(WindowEvent e) {
-				if (device.getFullScreenWindow() == fullscreenFrame) {
-					updateCanvas();
-				}
-			}
+
 			public void windowActivated(WindowEvent e) {
+				if (fullscreenOpening) {
+					fullscreenOpening = false;
+					return;
+				}
 				if (device.getFullScreenWindow() == fullscreenFrame) {
 					updateCanvas();
 				}
@@ -128,11 +144,14 @@ public class MainFrame {
 		FlowLayout lyt = new FlowLayout(FlowLayout.CENTER, 5, 0);
 		displayPanel = new JPanel(lyt);
 		displayPanel.setPreferredSize(new Dimension(width, height));
+		lyt = new FlowLayout(FlowLayout.CENTER, 5, 0);
+		fullscreenPanel = new JPanel(lyt);
 		canvas = new Canvas();
 		canvas.setIgnoreRepaint(true);
 		canvas.setPreferredSize(new Dimension(width, height));
 		displayPanel.add(canvas);
 		frame.getContentPane().add(displayPanel);
+		fullscreenFrame.getContentPane().add(fullscreenPanel);
 
 		commandsPanel = new JPanel();
 		commands = new JButton[2];
@@ -219,16 +238,17 @@ public class MainFrame {
 			}
 		}
 		displayPanel.removeAll();
-		fullscreenFrame.getContentPane().removeAll();
+		fullscreenPanel.removeAll();
 		if (isFullscreen()) {
-			current._activate(fullscreenFrame.getContentPane());
+			current._activate(fullscreenPanel);
 		} else {
 			current._activate(displayPanel);
+			frame.pack();
 		}
 	}
 
 	private static boolean isFullscreen() {
-		return device.getFullScreenWindow() == instance.fullscreenFrame;
+		return instance.fullscreenActive;
 	}
 
 	private static void setLookAndFeel() {
@@ -255,7 +275,9 @@ public class MainFrame {
 		this.width = width;
 		this.height = height;
 		displayPanel.setPreferredSize(new Dimension(width, height));
-		displayPanel.setSize(new Dimension(width, height));
+		displayPanel.setSize(width, height);
+		fullscreenPanel.setPreferredSize(displayPanel.getPreferredSize());
+		fullscreenPanel.setSize(width, height);
 		//if (current != null) current._resize(width, height);
 		frame.pack();
 		if (current != null) {

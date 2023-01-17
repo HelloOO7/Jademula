@@ -8,11 +8,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.image.BufferStrategy;
-import java.util.Arrays;
 import java.util.Queue;
-import javax.swing.JLabel;
-
-import javax.swing.JPanel;
 
 public abstract class Canvas extends Displayable {
 
@@ -222,7 +218,6 @@ public abstract class Canvas extends Displayable {
 	public synchronized void _activate(Container panel) {
 		canvas.setSize(new Dimension(MainFrame.getInstance().getWidth(), MainFrame.getInstance().getHeight()));
 		canvas.setPreferredSize(new Dimension(MainFrame.getInstance().getWidth(), MainFrame.getInstance().getHeight()));
-		panel.setSize(new Dimension(MainFrame.getInstance().getWidth(), MainFrame.getInstance().getHeight()));
 		panel.add(canvas);
 		canvas.createBufferStrategy(2);
 		bs = canvas.getBufferStrategy();
