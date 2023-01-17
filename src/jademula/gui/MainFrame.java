@@ -6,10 +6,8 @@ import jademula.Jademula;
 
 import java.awt.BorderLayout;
 import java.awt.Canvas;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -17,7 +15,6 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.awt.image.BufferStrategy;
 
 import javax.microedition.lcdui.Command;
@@ -25,13 +22,9 @@ import javax.microedition.lcdui.Display;
 import javax.microedition.lcdui.Displayable;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.BoxLayout;
-import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -51,7 +44,7 @@ public class MainFrame {
 	private int commandIndex;
 	private Graphics2D g;
 	private Menu menu;
-	
+
 	private boolean fullscreenActive = false;
 	private boolean fullscreenOpening;
 
@@ -67,22 +60,29 @@ public class MainFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Runnable r = () -> {
-					if (isFullscreen()) {
-						device.setFullScreenWindow(null);
-						instance.fullscreenFrame.setVisible(false);
-						instance.frame.setVisible(true);
-					} else {
-						instance.frame.setVisible(false);
-						device.setFullScreenWindow(instance.fullscreenFrame);
-						instance.fullscreenOpening = true;
+					if (instance.current != null) {
+						instance.current._hide();
+						if (isFullscreen()) {
+							device.setFullScreenWindow(null);
+							instance.fullscreenFrame.setVisible(false);
+							instance.width = Handy.getCurrent().getWidth();
+							instance.height = Handy.getCurrent().getHeight();
+							instance.frame.setVisible(true);
+						} else {
+							instance.frame.setVisible(false);
+							Dimension ss = Toolkit.getDefaultToolkit().getScreenSize();
+							instance.width = ss.width;
+							instance.height = ss.height;
+							device.setFullScreenWindow(instance.fullscreenFrame);
+							instance.fullscreenOpening = true;
+						}
+						instance.fullscreenActive = !instance.fullscreenActive;
+						instance.updateCanvas();
 					}
-					instance.fullscreenActive = !instance.fullscreenActive;
-					instance.updateCanvas();
 				};
 				if (SwingUtilities.isEventDispatchThread()) {
 					r.run();
-				}
-				else {
+				} else {
 					SwingUtilities.invokeLater(r);
 				}
 			}
@@ -135,7 +135,7 @@ public class MainFrame {
 					fullscreenOpening = false;
 					return;
 				}
-				if (device.getFullScreenWindow() == fullscreenFrame) {
+				if (isFullscreen()) {
 					updateCanvas();
 				}
 			}
@@ -215,35 +215,40 @@ public class MainFrame {
 		if (current != null) {
 			current._deactivate();
 		}
-		current = displayable;
+		current = null;
 		removeCommands();
-		if (displayable._getCommands().length > 0) {
-			addCommand(displayable._getCommands()[0]);
-		}
-		if (displayable._getCommands().length > 1) {
-			addCommand(displayable._getCommands()[1]);
-		}
-		if (displayable._getListener() != null) {
+		if (displayable != null) {
 			if (displayable._getCommands().length > 0) {
-				commands[0].removeAll();
-				commands[0].addActionListener(
-						new ButtonListener(displayable, displayable._getCommands()[0], displayable._getListener())
-				);
+				addCommand(displayable._getCommands()[0]);
 			}
 			if (displayable._getCommands().length > 1) {
-				commands[1].removeAll();
-				commands[1].addActionListener(
-						new ButtonListener(displayable, displayable._getCommands()[1], displayable._getListener())
-				);
+				addCommand(displayable._getCommands()[1]);
+			}
+			if (displayable._getListener() != null) {
+				if (displayable._getCommands().length > 0) {
+					commands[0].removeAll();
+					commands[0].addActionListener(
+							new ButtonListener(displayable, displayable._getCommands()[0], displayable._getListener())
+					);
+				}
+				if (displayable._getCommands().length > 1) {
+					commands[1].removeAll();
+					commands[1].addActionListener(
+							new ButtonListener(displayable, displayable._getCommands()[1], displayable._getListener())
+					);
+				}
 			}
 		}
 		displayPanel.removeAll();
 		fullscreenPanel.removeAll();
-		if (isFullscreen()) {
-			current._activate(fullscreenPanel);
-		} else {
-			current._activate(displayPanel);
-			frame.pack();
+		current = displayable;
+		if (current != null) {
+			if (isFullscreen()) {
+				current._activate(fullscreenPanel);
+			} else {
+				current._activate(displayPanel);
+				frame.pack();
+			}
 		}
 	}
 
@@ -272,12 +277,13 @@ public class MainFrame {
 		if (width == this.width && height == this.height) {
 			return;
 		}
+		if (current != null) {
+			current._deactivate();
+		}
 		this.width = width;
 		this.height = height;
 		displayPanel.setPreferredSize(new Dimension(width, height));
-		displayPanel.setSize(width, height);
-		fullscreenPanel.setPreferredSize(displayPanel.getPreferredSize());
-		fullscreenPanel.setSize(width, height);
+		displayPanel.setSize(displayPanel.getPreferredSize());
 		//if (current != null) current._resize(width, height);
 		frame.pack();
 		if (current != null) {
@@ -286,7 +292,7 @@ public class MainFrame {
 			System.err.println("current is null");
 		}
 
-		System.err.println("DPX: " + displayPanel.getWidth());
+		//System.err.println("DPX: " + displayPanel.getWidth());
 		/*canvas.setPreferredSize(new Dimension(width, height));
 		canvas.setSize(new Dimension(width, height));
 		frame.pack();

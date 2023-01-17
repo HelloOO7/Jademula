@@ -227,7 +227,7 @@ public class RecordStore {
 		_assertOpen();
 		records.add(new _Record(records.size() - 1, data, offset, numBytes));
 		_save();
-		System.out.println("addRecord " + storeName + " " + records.size());
+		//System.out.println("addRecord " + storeName + " " + records.size());
 		for (RecordListener listener : listeners) listener.recordAdded(this, records.size() - 1);
 		return records.size();
 	}
@@ -245,7 +245,7 @@ public class RecordStore {
 	}
 
 	public synchronized int getRecord(int recordId, byte[] buffer, int offset) throws RecordStoreNotOpenException, InvalidRecordIDException, RecordStoreException {
-		System.out.println("getRecord " + storeName + " " + recordId);
+		//System.out.println("getRecord " + storeName + " " + recordId);
 		_assertOpen();
 		_Record record = _getRecord(recordId);
 		System.arraycopy(record.getData(), 0, buffer, offset, record.getData().length);
@@ -253,7 +253,7 @@ public class RecordStore {
 	}
 
 	public synchronized byte[] getRecord(int recordId) throws RecordStoreNotOpenException, InvalidRecordIDException, RecordStoreException {
-		System.out.println("getRecord " + storeName + " " + recordId);
+		//System.out.println("getRecord " + storeName + " " + recordId);
 		_assertOpen();
 		_Record record = _getRecord(recordId);
 		byte[] data = new byte[record.getData().length];
@@ -262,7 +262,7 @@ public class RecordStore {
 	}
 
 	public synchronized void setRecord(int recordId, byte[] newData, int offset, int numBytes) throws RecordStoreNotOpenException, InvalidRecordIDException, RecordStoreException, RecordStoreFullException {
-		System.out.println("setRecord " + storeName + " " + recordId);
+		//System.out.println("setRecord " + storeName + " " + recordId);
 		_assertOpen();
 		_Record record = _getRecord(recordId);
 		byte[] data = new byte[numBytes];

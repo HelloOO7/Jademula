@@ -61,9 +61,8 @@ public class MidletLoader {
 					MidletLoader.this.run();
 				}
 			});
-			m._destroyApp();
-		}
-		else {
+			stop();
+		} else {
 			run();
 		}
 	}
@@ -83,7 +82,10 @@ public class MidletLoader {
 	}
 
 	public void stop() {
-		ClassPathHacker.removeFile(midletName);
+		m._destroyApp();
+		if (midletName != null) {
+			ClassPathHacker.removeFile(midletName);
+		}
 	}
 
 	public String getAttribute(String name) {

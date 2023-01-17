@@ -1,6 +1,7 @@
 package javax.microedition.lcdui;
 
 import jademula.gui.MainFrame;
+import java.awt.Container;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -29,10 +30,10 @@ public class List extends Screen implements Choice {
 	
 	private java.util.List<ListElement> elements = new ArrayList<ListElement>();
 	private int selected;
-	private JPanel panel;
+	private Container panel;
 
 	public List(String title, int listType) {
-		System.err.println("List not implemented.");
+		//System.err.println("List not implemented.");
 	}
 
 	public List(String title, int listType, String[] stringElements, Image[] imageElements) {
@@ -127,7 +128,7 @@ public class List extends Screen implements Choice {
 		return null;
 	}
 	
-	public void _activate(JPanel panel) {
+	public void _activate(Container panel) {
 		System.err.println("List activated");
 		this.panel = panel;
 		_repaint();

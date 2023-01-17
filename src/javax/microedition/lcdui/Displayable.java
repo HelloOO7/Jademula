@@ -74,6 +74,8 @@ public abstract class Displayable {
 	
 	public void _activate(Container panel) { }
 	
+	public void _hide() { }
+	
 	public void _deactivate() { }
 	
 	public void _onKeyPressed(int k) { }

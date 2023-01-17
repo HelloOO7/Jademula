@@ -2,7 +2,6 @@ package javax.microedition.lcdui;
 
 import jademula.Jademula;
 import jademula.gui.MainFrame;
-import java.awt.Color;
 import java.awt.Container;
 
 import java.awt.Dimension;
@@ -218,18 +217,23 @@ public abstract class Canvas extends Displayable {
 	public synchronized void _activate(Container panel) {
 		canvas.setSize(new Dimension(MainFrame.getInstance().getWidth(), MainFrame.getInstance().getHeight()));
 		canvas.setPreferredSize(new Dimension(MainFrame.getInstance().getWidth(), MainFrame.getInstance().getHeight()));
-		panel.add(canvas);
+		if (canvas.getParent() != panel) {
+			panel.add(canvas);
+		}
 		canvas.createBufferStrategy(2);
 		bs = canvas.getBufferStrategy();
 		g = Graphics._create((Graphics2D) bs.getDrawGraphics(), true);
 		activated = true;
 		showNotify();
-		repaint();
+		//repaint(); - this tends to bug out fullscreen idk why
 		System.err.println("Canvas-Width: " + canvas.getWidth());
 	}
 
 	public synchronized void _deactivate() {
 		activated = false;
+	}
+
+	public void _hide() {
 		hideNotify();
 	}
 
