@@ -1,6 +1,12 @@
 package javax.microedition.midlet;
 
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.jar.Attributes;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.microedition.io.ConnectionNotFoundException;
 
@@ -10,13 +16,13 @@ public abstract class MIDlet {
 	private Attributes attr;
 
 	private Runnable destroyListener = null;
-	
+
 	public boolean _destroyed;
-	
+
 	public static void _setAttr(Attributes attr) {
 		attributes = attr;
 	}
-	
+
 	public void _setDestroyListener(Runnable r) {
 		destroyListener = r;
 	}
@@ -55,6 +61,13 @@ public abstract class MIDlet {
 	}
 
 	public final boolean platformRequest(String URL) throws ConnectionNotFoundException {
+		Desktop desktop = java.awt.Desktop.getDesktop();
+		try {
+			URI oURL = new URI(URL);
+			desktop.browse(oURL);
+		} catch (IOException | URISyntaxException e) {
+			throw new ConnectionNotFoundException();
+		}
 		return true;
 	}
 
